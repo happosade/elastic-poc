@@ -1,0 +1,88 @@
+version: '3'
+services:
+  es01:
+    build:
+      dockerfile: Dockerfile
+      context: ./elasticsearch
+    container_name: es01
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es02,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-XX:-TieredCompilation -XX:ReservedCodeCacheSize=64M -XX:InitialCodeCacheSize=64M -XX:+UnlockDiagnosticVMOptions -XX:+UseAESCTRIntrinsics -XX:+AlwaysPreTouch -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC -XX:MaxRAMPercentage=80 -XX:InitialRAMPercentage=100"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+    deploy:
+      resources:
+        limits:
+          memory: "2GB"
+  es02:
+    build:
+      dockerfile: Dockerfile
+      context: ./elasticsearch
+    container_name: es02
+    environment:
+      - node.name=es02
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es01,es03
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-XX:-TieredCompilation -XX:ReservedCodeCacheSize=64M -XX:InitialCodeCacheSize=64M -XX:+UnlockDiagnosticVMOptions -XX:+UseAESCTRIntrinsics -XX:+AlwaysPreTouch -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC -XX:MaxRAMPercentage=80 -XX:InitialRAMPercentage=100"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data02:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+    deploy:
+      resources:
+        limits:
+          memory: "2GB"
+  es03:
+    build:
+      dockerfile: Dockerfile
+      context: ./elasticsearch
+    container_name: es03
+    environment:
+      - node.name=es03
+      - cluster.name=es-docker-cluster
+      - discovery.seed_hosts=es01,es02
+      - cluster.initial_master_nodes=es01,es02,es03
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-XX:-TieredCompilation -XX:ReservedCodeCacheSize=64M -XX:InitialCodeCacheSize=64M -XX:+UnlockDiagnosticVMOptions -XX:+UseAESCTRIntrinsics -XX:+AlwaysPreTouch -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC -XX:MaxRAMPercentage=80 -XX:InitialRAMPercentage=100"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data03:/usr/share/elasticsearch/data
+    networks:
+      - elastic
+    deploy:
+      resources:
+        limits:
+          memory: "2GB"
+
+volumes:
+  data01:
+    driver: local
+  data02:
+    driver: local
+  data03:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge
